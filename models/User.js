@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: 'Student',
     },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
 });
 
 module.exports = mongoose.model('User', userSchema);

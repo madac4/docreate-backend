@@ -1,9 +1,10 @@
+const CryptoJS = require('crypto-js');
 const router = require('express').Router();
 
 const User = require('../models/User.js');
-const { verifyToken } = require('../middleware/middleware');
+const { verifyTokenAndAdmin, verifyToken } = require('../middleware/middleware');
 
-router.delete('/delete/:id', verifyToken, async (req, res) => {
+router.delete('/delete/:id', verifyTokenAndAdmin, async (req, res) => {
     const user = await User.findById(req.user.id).select('-password');
     if (user && user.role.toLowerCase() === 'admin') {
         User.findByIdAndDelete(req.params.id, (error) => {
@@ -16,7 +17,7 @@ router.delete('/delete/:id', verifyToken, async (req, res) => {
     }
 });
 
-router.get('/getUsers', verifyToken, async (req, res) => {
+router.get('/getUsers', verifyTokenAndAdmin, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         if (user && user.role.toLowerCase() === 'admin') {
@@ -25,6 +26,31 @@ router.get('/getUsers', verifyToken, async (req, res) => {
         }
     } catch (error) {
         console.log(error);
+    }
+});
+
+router.put('/update/:id', verifyTokenAndAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { name, email, password } = req.body;
+    const updateObject = {};
+    if (name) {
+        updateObject.name = name;
+    }
+    if (email) {
+        updateObject.email = email;
+    }
+    if (password) {
+        updateObject.password = CryptoJS.AES.encrypt(
+            password,
+            process.env.PASSWORD_SECURE,
+        ).toString();
+    }
+    try {
+        const newUser = await User.findByIdAndUpdate(id, updateObject, { new: true });
+        res.json(newUser);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Utilizatorul nu poate fi modificat' });
     }
 });
 
