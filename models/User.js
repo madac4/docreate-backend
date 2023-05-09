@@ -17,10 +17,24 @@ const userSchema = new mongoose.Schema({
     profilePicture: {
         type: String,
     },
+    organization: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        required: true,
+    },
     role: {
         type: String,
         required: true,
-        default: 'Student',
+    },
+    invitationToken: {
+        type: String,
+    },
+    invitationExpires: {
+        type: Date,
+    },
+    invitedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
     },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
