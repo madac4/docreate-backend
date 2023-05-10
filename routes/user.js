@@ -17,7 +17,7 @@ router.delete('/delete/:id', verifyTokenAndAdmin, async (req, res) => {
     }
 });
 
-router.get('/getUsers', verifyTokenAndAdmin, async (req, res) => {
+router.get('/get', verifyTokenAndAdmin, async (req, res) => {
     try {
         const users = await User.find({ organization: req.user.organization }).select('-password');
         res.status(200).json(users);
