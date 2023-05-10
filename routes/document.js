@@ -9,30 +9,34 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const { verifyToken, verifyTokenAndAdmin } = require('../middleware/middleware');
 const Document = require('../models/Document.js');
+const Organization = require('../models/Organization.js');
 
-router.post('/', upload.single('file'), verifyTokenAndAdmin, (req, res) => {
+router.post('/', upload.single('file'), verifyTokenAndAdmin, async (req, res) => {
     const file = req.file;
     const inputs = JSON.parse(req.body.inputs);
-    console.log(inputs);
-    const document = new Document({
-        name: req.body.name,
-        file: {
-            data: file.buffer,
-            contentType: file.mimetype,
-        },
-        inputs: inputs,
-    });
 
-    console.log(document);
+    try {
+        const document = new Document({
+            name: req.body.name,
+            file: {
+                data: file.buffer,
+                contentType: file.mimetype,
+            },
+            inputs: inputs,
+            organization: req.user.organization,
+        });
 
-    document.save((error, result) => {
-        if (error) {
-            console.error(error);
-            res.sendStatus(500);
-        } else {
-            res.json(result);
-        }
-    });
+        await document.save();
+
+        const organization = await Organization.findOneAndUpdate(
+            { admin: req.user.id },
+            { $push: { documents: document._id } },
+            { new: true },
+        );
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
 });
 
 router.put('/update/:id', upload.single('file'), verifyTokenAndAdmin, async (req, res) => {
@@ -70,9 +74,10 @@ router.delete('/delete/:id', verifyTokenAndAdmin, async (req, res) => {
     });
 });
 
-router.get('/', verifyTokenAndAdmin, async (req, res) => {
+router.get('/', verifyToken, async (req, res) => {
     try {
-        const documents = await Document.find().select('-file');
+        const organizationId = req.user.organization;
+        const documents = await Document.find({ organization: organizationId }).select('-file');
         res.json(documents);
     } catch (error) {
         console.error(error);
@@ -80,7 +85,7 @@ router.get('/', verifyTokenAndAdmin, async (req, res) => {
     }
 });
 
-router.get('/getfile/:id', async (req, res) => {
+router.get('/getfile/:id', verifyToken, async (req, res) => {
     try {
         const id = req.params.id;
         const documentData = req.query;

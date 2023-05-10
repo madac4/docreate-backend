@@ -2,7 +2,7 @@ const CryptoJS = require('crypto-js');
 const router = require('express').Router();
 
 const User = require('../models/User.js');
-const { verifyTokenAndAdmin, verifyToken } = require('../middleware/middleware');
+const { verifyTokenAndAdmin } = require('../middleware/middleware');
 
 router.delete('/delete/:id', verifyTokenAndAdmin, async (req, res) => {
     const user = await User.findById(req.user.id).select('-password');
@@ -19,13 +19,11 @@ router.delete('/delete/:id', verifyTokenAndAdmin, async (req, res) => {
 
 router.get('/getUsers', verifyTokenAndAdmin, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
-        if (user && user.role.toLowerCase() === 'admin') {
-            const users = await User.find();
-            res.status(200).json(users);
-        }
+        const users = await User.find({ organization: req.user.organization }).select('-password');
+        res.status(200).json(users);
     } catch (error) {
         console.log(error);
+        res.sendStatus(500);
     }
 });
 

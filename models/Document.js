@@ -15,6 +15,11 @@ const documentSchema = new mongoose.Schema({
         type: Array,
         required: true,
     },
+    organization: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        required: true,
+    },
 });
 
 documentSchema.pre('save', async function (next) {

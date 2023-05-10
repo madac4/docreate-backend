@@ -17,6 +17,12 @@ const organizationSchema = new mongoose.Schema({
             ref: 'User',
         },
     ],
+    documents: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Document',
+        },
+    ],
     invitations: [
         {
             type: mongoose.Schema.Types.ObjectId,
