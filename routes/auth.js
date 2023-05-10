@@ -14,8 +14,8 @@ let transporter = nodemailer.createTransport({
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-        user: 'giovanna.ortiz@ethereal.email',
-        pass: 'bk71e4QZWcWRs4h8Fv',
+        user: 'remington.weimann49@ethereal.email',
+        pass: '983wCQyHCgX4SKeAET',
     },
 });
 // let transporter = nodemailer.createTransport({
@@ -170,7 +170,7 @@ router.post('/invite', verifyTokenAndAdmin, async (req, res) => {
     // // Send an email to the user with a link containing the JWT
     const inviteLink = `https://docreate.vercel.app/register/${token}`;
     const mailOptions = {
-        from: 'contact@stellarsolutions.md',
+        from: 'remington.weimann49@ethereal.email',
         to: email,
         subject: 'You have been invited to join our organization',
         html: `Please follow this link to create your account: <a href="${inviteLink}">Click Here</a>`,
