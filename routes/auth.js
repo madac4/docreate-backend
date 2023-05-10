@@ -9,24 +9,24 @@ const { verifyToken, verifyTokenAndAdmin } = require('../middleware/middleware')
 const User = require('../models/User.js');
 const Organization = require('../models/Organization.js');
 
-// let transporter = nodemailer.createTransport({
-//     host: 'smtp.ethereal.email',
-//     port: 587,
-//     secure: false, // true for 465, false for other ports
-//     auth: {
-//         user: 'giovanna.ortiz@ethereal.email',
-//         pass: 'bk71e4QZWcWRs4h8Fv',
-//     },
-// });
 let transporter = nodemailer.createTransport({
-    host: 's1.stellarsolutions.md',
+    host: 'smtp.ethereal.email',
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-        user: 'contact@stellarsolutions.md',
-        pass: '8FdjLBbgzP',
+        user: 'giovanna.ortiz@ethereal.email',
+        pass: 'bk71e4QZWcWRs4h8Fv',
     },
 });
+// let transporter = nodemailer.createTransport({
+//     host: 's1.stellarsolutions.md',
+//     port: 587,
+//     secure: false, // true for 465, false for other ports
+//     auth: {
+//         user: 'contact@stellarsolutions.md',
+//         pass: '8FdjLBbgzP',
+//     },
+// });
 
 router.post(
     '/register-admin',
