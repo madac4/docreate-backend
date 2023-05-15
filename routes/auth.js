@@ -4,18 +4,23 @@ const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 const gravatar = require('gravatar');
 const nodemailer = require('nodemailer');
+const UAParser = require('ua-parser-js');
+const uuid = require('uuid');
+const axios = require('axios');
+const requestIp = require('request-ip');
 
 const { verifyToken, verifyTokenAndAdmin } = require('../middleware/middleware');
 const User = require('../models/User.js');
 const Organization = require('../models/Organization.js');
+const ActiveSession = require('../models/Session');
 
 let transporter = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-        user: 'remington.weimann49@ethereal.email',
-        pass: '983wCQyHCgX4SKeAET',
+        user: 'joey.wintheiser@ethereal.email',
+        pass: 'ywDR6u4uEXHYJnH3cJ',
     },
 });
 // let transporter = nodemailer.createTransport({
@@ -115,6 +120,31 @@ router.post(
                 ).toString(CryptoJS.enc.Utf8);
 
                 if (decryptedPassword === req.body.password) {
+                    const parser = new UAParser();
+                    const userAgent = req.headers['user-agent'];
+                    const parsedUserAgent = parser.setUA(userAgent).getResult();
+                    const browserName = parsedUserAgent.browser.name;
+                    const osName = parsedUserAgent.os.name;
+                    const ip = requestIp.getClientIp(req);
+                    const deviceId = uuid.v4();
+
+                    const response = await axios.get(
+                        `http://api.ipstack.com/${ip}?access_key=${process.env.IPSTACK_API_KEY}&format=1`,
+                    );
+
+                    const city = `${response.data.country_name}, ${response.data.city}`;
+
+                    const session = new ActiveSession({
+                        userId: user._id,
+                        deviceId: deviceId,
+                        browser: browserName,
+                        os: osName,
+                        ip: ip,
+                        city: city,
+                    });
+
+                    await session.save();
+
                     const payload = {
                         user: {
                             id: user.id,
@@ -129,7 +159,7 @@ router.post(
                         },
                         (err, token) => {
                             if (err) throw err;
-                            res.json({ token });
+                            res.json({ token, sessionId: session._id, deviceId: deviceId });
                         },
                     );
                 } else {
@@ -146,6 +176,18 @@ router.post(
 
 router.get('/', verifyToken, async (req, res) => {
     try {
+        const deviceId = req.query.deviceId;
+        const sessionId = req.query.sessionId;
+
+        const session = await ActiveSession.findOne({
+            _id: sessionId,
+            deviceId: deviceId,
+        });
+
+        if (!session) {
+            return res.status(404).json({ msg: 'Session not found', token: '' });
+        }
+
         const user = await User.findById(req.user.id).select('-password');
         res.json(user);
     } catch (error) {
@@ -220,6 +262,66 @@ router.get('/register/:token', async (req, res) => {
     }
 });
 
+router.post('/forget-password', async (req, res) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+        return res.status(400).json({ error: 'Utilizatorul nu a fost găsit' });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
+    await user.save();
+
+    const resetLink = `http://localhost:3000/reset-password/${token}`;
+
+    const mailOptions = {
+        from: '"Fred Foo 👻" <madaline.feeney@ethereal.email>',
+        to: email,
+        subject: 'Reset Password',
+        html: `You are receiving this email because you (or someone else) has requested a password reset for your account.<br/><br/>
+              Please click on the following link, or paste it into your browser to complete the process: <br/><br/>
+              <a href="${resetLink}">Resetează parola</a> <br/><br/>
+              If you did not request this, please ignore this email and your password will remain unchanged.<br/>`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+
+    res.json({ message: 'Verificati email pentru a reseta parola' });
+});
+
+router.put('/reset-password/:token', async (req, res) => {
+    const { password } = req.body;
+    const { token } = req.params;
+
+    const user = await User.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+        return res.status(400).json({ error: 'Invalid or expired token' });
+    }
+
+    user.password = CryptoJS.AES.encrypt(
+        password.newPassword,
+        process.env.PASSWORD_SECURE,
+    ).toString();
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.json({ message: 'Parola a fost resetată' });
+});
+
 module.exports = router;
 
 // router.post(
@@ -273,63 +375,3 @@ module.exports = router;
 //         }
 //     },
 // );
-
-// router.post('/forget-password', async (req, res) => {
-//     const { email } = req.body;
-
-//     const user = await User.findOne({ email });
-//     if (!user) {
-//         return res.status(400).json({ error: 'Utilizatorul nu a fost găsit' });
-//     }
-
-//     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-//     user.resetPasswordToken = token;
-//     user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
-//     await user.save();
-
-//     const resetLink = `https://docreate.vercel.app/reset-password/${token}`;
-
-//     const mailOptions = {
-//         from: '"Fred Foo 👻" <foo@example.com>',
-//         to: email,
-//         subject: 'Reset Password',
-//         html: `You are receiving this email because you (or someone else) has requested a password reset for your account.<br/><br/>
-//               Please click on the following link, or paste it into your browser to complete the process: <br/><br/>
-//               <a href="${resetLink}">Resetează parola</a> <br/><br/>
-//               If you did not request this, please ignore this email and your password will remain unchanged.<br/>`,
-//     };
-
-//     transporter.sendMail(mailOptions, (error, info) => {
-//         if (error) {
-//             console.log(error);
-//         } else {
-//             console.log('Email sent: ' + info.response);
-//         }
-//     });
-
-//     res.json({ message: 'Verificati email pentru a reseta parola' });
-// });
-
-// router.put('/reset-password/:token', async (req, res) => {
-//     const { password } = req.body;
-//     const { token } = req.params;
-
-//     const user = await User.findOne({
-//         resetPasswordToken: token,
-//         resetPasswordExpires: { $gt: Date.now() },
-//     });
-
-//     if (!user) {
-//         return res.status(400).json({ error: 'Invalid or expired token' });
-//     }
-
-//     user.password = CryptoJS.AES.encrypt(
-//         password.newPassword,
-//         process.env.PASSWORD_SECURE,
-//     ).toString();
-//     user.resetPasswordToken = null;
-//     user.resetPasswordExpires = null;
-//     await user.save();
-
-//     res.json({ message: 'Parola a fost resetată' });
-// });

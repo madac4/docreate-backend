@@ -33,6 +33,8 @@ router.post('/', upload.single('file'), verifyTokenAndAdmin, async (req, res) =>
             { $push: { documents: document._id } },
             { new: true },
         );
+
+        res.sendStatus(200);
     } catch (error) {
         console.error(error);
         res.sendStatus(500);

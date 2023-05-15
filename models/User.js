@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const CryptoJS = require('crypto-js');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -39,5 +40,14 @@ const userSchema = new mongoose.Schema({
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
 });
+
+userSchema.methods.checkPassword = function (password) {
+    const decryptedPassword = CryptoJS.AES.decrypt(
+        this.password,
+        process.env.PASSWORD_SECURE,
+    ).toString(CryptoJS.enc.Utf8);
+
+    return decryptedPassword !== password;
+};
 
 module.exports = mongoose.model('User', userSchema);
