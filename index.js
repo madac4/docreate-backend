@@ -8,7 +8,7 @@ const authRoute = require('./routes/auth');
 const userRoute = require('./routes/user');
 const documentRoute = require('./routes/document');
 const organizationRoute = require('./routes/organizations');
-const sessionRoute = require('./routes/sessions');
+// const sessionRoute = require('./routes/sessions');
 
 const app = express();
 const port = 3002;
@@ -25,6 +25,6 @@ app.use('/api/auth', authRoute);
 app.use('/api/users', userRoute);
 app.use('/api/documents', documentRoute);
 app.use('/api/organizations', organizationRoute);
-app.use('/api/sessions', sessionRoute);
+// app.use('/api/sessions', sessionRoute);
 
 app.listen(port, () => console.log(`Server listening on port ${port}`));

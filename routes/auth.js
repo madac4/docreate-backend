@@ -14,24 +14,24 @@ const User = require('../models/User.js');
 const Organization = require('../models/Organization.js');
 const ActiveSession = require('../models/Session');
 
-let transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: 'joey.wintheiser@ethereal.email',
-        pass: 'ywDR6u4uEXHYJnH3cJ',
-    },
-});
 // let transporter = nodemailer.createTransport({
-//     host: 's1.stellarsolutions.md',
+//     host: 'smtp.ethereal.email',
 //     port: 587,
 //     secure: false, // true for 465, false for other ports
 //     auth: {
-//         user: 'contact@stellarsolutions.md',
-//         pass: '8FdjLBbgzP',
+//         user: 'joey.wintheiser@ethereal.email',
+//         pass: 'ywDR6u4uEXHYJnH3cJ',
 //     },
 // });
+let transporter = nodemailer.createTransport({
+    host: 's1.stellarsolutions.md',
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: 'contact@stellarsolutions.md',
+        pass: '8FdjLBbgzP',
+    },
+});
 
 router.post(
     '/register-admin',
@@ -176,18 +176,6 @@ router.post(
 
 router.get('/', verifyToken, async (req, res) => {
     try {
-        const deviceId = req.query.deviceId;
-        const sessionId = req.query.sessionId;
-
-        const session = await ActiveSession.findOne({
-            _id: sessionId,
-            deviceId: deviceId,
-        });
-
-        if (!session) {
-            return res.status(404).json({ msg: 'Session not found', token: '' });
-        }
-
         const user = await User.findById(req.user.id).select('-password');
         res.json(user);
     } catch (error) {
@@ -212,7 +200,7 @@ router.post('/invite', verifyTokenAndAdmin, async (req, res) => {
     // // Send an email to the user with a link containing the JWT
     const inviteLink = `https://docreate.vercel.app/register/${token}`;
     const mailOptions = {
-        from: 'remington.weimann49@ethereal.email',
+        from: 'contact@stellarsolutions.md',
         to: email,
         subject: 'You have been invited to join our organization',
         html: `Please follow this link to create your account: <a href="${inviteLink}">Click Here</a>`,
@@ -279,7 +267,7 @@ router.post('/forget-password', async (req, res) => {
     const resetLink = `https://docreate.vercel.app/reset-password/${token}`;
 
     const mailOptions = {
-        from: '"Fred Foo 👻" <madaline.feeney@ethereal.email>',
+        from: 'contact@stellarsolutions.md',
         to: email,
         subject: 'Reset Password',
         html: `You are receiving this email because you (or someone else) has requested a password reset for your account.<br/><br/>
