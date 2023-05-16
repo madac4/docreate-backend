@@ -189,8 +189,8 @@ router.post('/invite', verifyTokenAndAdmin, async (req, res) => {
     });
 
     // Send an email to the user with a link containing the JWT
-    const inviteLink = `http://localhost:3000/register/${token}`;
-    // const inviteLink = `https://docreate.vercel.app/register/${token}`;
+    // const inviteLink = `http://localhost:3000/register/${token}`;
+    const inviteLink = `https://docreate.vercel.app/register/${token}`;
     const mailOptions = {
         from: `DoCreate ${senderEmail}`,
         to: email,
