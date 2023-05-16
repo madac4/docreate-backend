@@ -1670,6 +1670,11 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
+mailchimp-marketing@^0.0.1-security:
+  version "0.0.1-security"
+  resolved "https://registry.yarnpkg.com/mailchimp-marketing/-/mailchimp-marketing-0.0.1-security.tgz#472cb83f32f36e6bdbfe77e47a2aeaa40fe92ba2"
+  integrity sha512-0DS3eMxPSwOSxU5iByBQhUD6+IML5rHLAeVbtJAWFDMIjowY4bAojEOQFpgDFsTodlp/JYDGQR8G+VbuPAH/GA==
+
 mammoth@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/mammoth/-/mammoth-1.5.1.tgz#ef979dfc9ea411e5f2841a989f5ba70e115f0536"

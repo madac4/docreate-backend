@@ -14,22 +14,12 @@ const User = require('../models/User.js');
 const Organization = require('../models/Organization.js');
 const ActiveSession = require('../models/Session');
 
-// let transporter = nodemailer.createTransport({
-//     host: 'smtp.ethereal.email',
-//     port: 587,
-//     secure: false, // true for 465, false for other ports
-//     auth: {
-//         user: 'joey.wintheiser@ethereal.email',
-//         pass: 'ywDR6u4uEXHYJnH3cJ',
-//     },
-// });
-let transporter = nodemailer.createTransport({
-    host: 's1.stellarsolutions.md',
-    port: 587,
-    secure: false, // true for 465, false for other ports
+const senderEmail = 'contact@stellarsolutions.md';
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
     auth: {
-        user: 'contact@stellarsolutions.md',
-        pass: '8FdjLBbgzP',
+        user: 'orbupetru12@gmail.com',
+        pass: 'jzraqoqnwvqngdwl',
     },
 });
 
@@ -197,15 +187,23 @@ router.post('/invite', verifyTokenAndAdmin, async (req, res) => {
         expiresIn: '24h',
     });
 
-    // // Send an email to the user with a link containing the JWT
+    // Send an email to the user with a link containing the JWT
+    // const inviteLink = `http://localhost:3000/register/${token}`;
     const inviteLink = `https://docreate.vercel.app/register/${token}`;
     const mailOptions = {
-        from: 'contact@stellarsolutions.md',
+        from: `DoCreate ${senderEmail}`,
         to: email,
         subject: 'You have been invited to join our organization',
         html: `Please follow this link to create your account: <a href="${inviteLink}">Click Here</a>`,
     };
-    await transporter.sendMail(mailOptions);
+
+    await transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
 
     res.status(200).json({ message: 'Invitation sent' });
 });
@@ -267,7 +265,7 @@ router.post('/forget-password', async (req, res) => {
     const resetLink = `https://docreate.vercel.app/reset-password/${token}`;
 
     const mailOptions = {
-        from: 'contact@stellarsolutions.md',
+        from: `DoCreate ${senderEmail}`,
         to: email,
         subject: 'Reset Password',
         html: `You are receiving this email because you (or someone else) has requested a password reset for your account.<br/><br/>
