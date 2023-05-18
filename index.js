@@ -26,6 +26,4 @@ app.use('/api/users', userRoute);
 app.use('/api/documents', documentRoute);
 app.use('/api/organizations', organizationRoute);
 
-app.listen(process.env.PORT || 3003, () =>
-    console.log(`Server is running on port ${process.env.PORT || 3003}`),
-);
+app.listen(3002, () => console.log(`Server is running on port 3002`));
