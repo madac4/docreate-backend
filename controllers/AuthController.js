@@ -37,8 +37,8 @@ const inviteUser = async (req, res) => {
             },
         );
 
-        const inviteLink = `http://localhost:3000/register/${token}`;
-        // const inviteLink = `https://docreate.vercel.app/register/${token}`;
+        // const inviteLink = `http://localhost:3000/register/${token}`;
+        const inviteLink = `https://docreate.vercel.app/register/${token}`;
         const mailOptions = {
             from: `DoCreate ${senderEmail}`,
             to: email,
