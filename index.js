@@ -11,8 +11,8 @@ const documentRoute = require('./routes/document');
 const organizationRoute = require('./routes/organizations');
 
 const app = express();
-app.use(bodyParser.json());
 app.use(cors());
+app.use(bodyParser.json());
 
 mongoose.set('strictQuery', false);
 
