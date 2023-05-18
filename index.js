@@ -10,8 +10,6 @@ const userRoute = require('./routes/user');
 const documentRoute = require('./routes/document');
 const organizationRoute = require('./routes/organizations');
 
-// const sessionRoute = require('./routes/sessions');
-
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -27,7 +25,6 @@ app.use('/api/auth', authRoute);
 app.use('/api/users', userRoute);
 app.use('/api/documents', documentRoute);
 app.use('/api/organizations', organizationRoute);
-// app.use('/api/sessions', sessionRoute);
 
 app.listen(process.env.PORT || 3003, (err) => {
     err ? console.log(err) : console.log(`Server is running on port ${process.env.PORT || 3003}`);
