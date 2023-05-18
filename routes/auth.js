@@ -104,43 +104,39 @@ router.post('/register', registerValidation, async (req, res) => {
 //? REGISTER USER
 
 //? LOGIN USER
-router.post('/login', loginValidation, async (req, res) => {
-    try {
-        const user = await User.findOne({ email: req.body.email });
+router.post('/login', async (req, res) => {
+    const user = await User.findOne({ email: req.body.email });
 
-        if (!user) {
-            return res.status(400).json({ errors: [{ msg: 'Email sau Parola este greșită' }] });
-        }
-
-        const decryptedPassword = CryptoJS.AES.decrypt(
-            user.password,
-            process.env.PASSWORD_SECURE,
-        ).toString(CryptoJS.enc.Utf8);
-
-        if (decryptedPassword !== req.body.password) {
-            return res.status(401).send({ message: 'Email sau Parola este greșită' });
-        }
-
-        const payload = {
-            user: {
-                id: user.id,
-            },
-        };
-
-        jwt.sign(
-            payload,
-            process.env.JWT_SECRET,
-            {
-                expiresIn: req.body.remember ? '14d' : '12h',
-            },
-            (err, token) => {
-                if (err) throw err;
-                res.json({ token });
-            },
-        );
-    } catch (error) {
-        res.status(400).send(error);
+    if (!user) {
+        return res.status(400).json({ errors: [{ msg: 'Email sau Parola este greșită' }] });
     }
+
+    const decryptedPassword = CryptoJS.AES.decrypt(
+        user.password,
+        process.env.PASSWORD_SECURE,
+    ).toString(CryptoJS.enc.Utf8);
+
+    if (decryptedPassword !== req.body.password) {
+        return res.status(401).send({ message: 'Email sau Parola este greșită' });
+    }
+
+    const payload = {
+        user: {
+            id: user.id,
+        },
+    };
+
+    jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        {
+            expiresIn: req.body.remember ? '14d' : '12h',
+        },
+        (err, token) => {
+            if (err) throw err;
+            res.json({ token });
+        },
+    );
 });
 //? LOGIN USER
 

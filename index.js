@@ -11,8 +11,8 @@ const organizationRoute = require('./routes/organizations');
 
 const app = express();
 const port = 3002;
-app.use(cors());
 app.use(bodyParser.json());
+app.use(cors());
 
 mongoose.set('strictQuery', false);
 mongoose
