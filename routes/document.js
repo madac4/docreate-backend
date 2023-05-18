@@ -1,6 +1,5 @@
 const multer = require('multer');
 const slugify = require('slugify');
-
 const Docxtemplater = require('docxtemplater');
 const PizZip = require('pizzip');
 
@@ -9,7 +8,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const { verifyToken, verifyTokenAndAdmin } = require('../middleware/middleware');
 const Document = require('../models/Document.js');
-const Organization = require('../models/Organization.js');
 
 router.post('/', upload.single('file'), verifyTokenAndAdmin, async (req, res) => {
     const file = req.file;
