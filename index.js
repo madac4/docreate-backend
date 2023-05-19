@@ -11,7 +11,7 @@ const organizationRoute = require('./routes/organizations');
 
 const app = express();
 const port = 3002;
-app.use(cors({ origin: 'https://docreate.vercel.app/' }));
+app.use(cors());
 app.use(bodyParser.json());
 
 mongoose.set('strictQuery', false);
@@ -26,3 +26,6 @@ app.use('/api/documents', documentRoute);
 app.use('/api/organizations', organizationRoute);
 
 app.listen(port, () => console.log(`Server listening on port ${port}`));
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
