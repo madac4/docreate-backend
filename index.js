@@ -10,8 +10,8 @@ const documentRoute = require('./routes/document');
 const organizationRoute = require('./routes/organizations');
 
 const app = express();
-app.use(cors());
 const port = 3002;
+app.use(cors({ origin: 'https://docreate.vercel.app/' }));
 app.use(bodyParser.json());
 
 mongoose.set('strictQuery', false);
