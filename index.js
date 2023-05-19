@@ -12,7 +12,13 @@ const organizationRoute = require('./routes/organizations');
 const app = express();
 const port = 3002;
 app.use(bodyParser.json());
-app.use(cors());
+const corsOptions = {
+    origin: '*',
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 mongoose.set('strictQuery', false);
 mongoose
