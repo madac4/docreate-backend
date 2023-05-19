@@ -10,15 +10,9 @@ const documentRoute = require('./routes/document');
 const organizationRoute = require('./routes/organizations');
 
 const app = express();
+app.use(cors());
 const port = 3002;
 app.use(bodyParser.json());
-const corsOptions = {
-    origin: '*',
-    credentials: true, //access-control-allow-credentials:true
-    optionSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
 
 mongoose.set('strictQuery', false);
 mongoose
