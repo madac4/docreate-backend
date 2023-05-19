@@ -17,13 +17,13 @@ const {
 } = require('../validation/auth');
 const { verifyToken, verifyTokenAndAdmin } = require('../middleware/middleware');
 
-router.post('/invite', [verifyTokenAndAdmin, mailValidation], inviteUser);
-router.post('/register', registerValidation, registerUser);
-router.post('/login', loginValidation, loginUser);
-router.post('/forget-password', mailValidation, forgetPassword);
+router.post('/invite', verifyTokenAndAdmin, inviteUser);
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+router.post('/forget-password', forgetPassword);
 router.get('/', verifyToken, getUser);
 router.get('/register/:token', getEmailFromToken);
-router.put('/reset-password/:token', passwordValidation, resetPassword);
+router.put('/reset-password/:token', resetPassword);
 
 module.exports = router;
 
