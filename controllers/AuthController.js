@@ -144,41 +144,37 @@ const getUser = async (req, res) => {
 };
 
 const forgetPassword = async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        const { email } = req.body;
-        const user = await User.findOne({ email });
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //     return res.status(400).json({ errors: errors.array() });
+    // }
+    const { email } = req.body;
+    const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(400).json({ error: 'Utilizatorul nu a fost găsit' });
-        }
+    if (!user) {
+        return res.status(400).json({ error: 'Utilizatorul nu a fost găsit' });
+    }
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        user.resetPasswordToken = token;
-        user.resetPasswordExpires = Date.now() + 3600000;
-        await user.save();
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000;
+    await user.save();
 
-        // const resetLink = `http://localhost:3000/reset-password/${token}`;
-        const resetLink = `https://docreate.vercel.app/reset-password/${token}`;
+    // const resetLink = `http://localhost:3000/reset-password/${token}`;
+    const resetLink = `https://docreate.vercel.app/reset-password/${token}`;
 
-        const mailOptions = {
-            from: `DoCreate ${senderEmail}`,
-            to: email,
-            subject: 'Reset Password',
-            html: `You are receiving this email because you (or someone else) has requested a password reset for your account.<br/><br/>
+    const mailOptions = {
+        from: `DoCreate ${senderEmail}`,
+        to: email,
+        subject: 'Reset Password',
+        html: `You are receiving this email because you (or someone else) has requested a password reset for your account.<br/><br/>
                   Please click on the following link, or paste it into your browser to complete the process: <br/><br/>
                   <a href="${resetLink}">Resetează parola</a> <br/><br/>
                   If you did not request this, please ignore this email and your password will remain unchanged.<br/>`,
-        };
+    };
 
-        await transporter.sendMail(mailOptions);
-        res.json({ message: 'Verificati email pentru a reseta parola' });
-    } catch (error) {
-        res.status(500).json({ message: 'Email-ul nu a putut fi trimis' });
-    }
+    await transporter.sendMail(mailOptions);
+    res.json({ message: 'Verificati email pentru a reseta parola' });
 };
 
 const resetPassword = async (req, res) => {
