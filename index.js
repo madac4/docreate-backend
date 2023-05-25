@@ -9,10 +9,10 @@ const userRoute = require('./routes/user');
 const documentRoute = require('./routes/document');
 const organizationRoute = require('./routes/organizations');
 
-const app = express();
 const port = 3002;
-app.use(cors());
+const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
 mongoose.set('strictQuery', false);
 mongoose
