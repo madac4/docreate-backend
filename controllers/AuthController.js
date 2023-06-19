@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/User.js');
 
-const senderEmail = 'contact@stellarsolutions.md';
+const senderEmail = 'orbupetru12@gmail.com';
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -130,7 +130,8 @@ const loginUser = async (req, res) => {
             },
         );
     } catch (error) {
-        res.status(400).send(error);
+        console.error(error);
+        res.status(500).json({ message: 'A apărut o eroare. Vă rugăm să încercați mai târziu.' });
     }
 };
 

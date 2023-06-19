@@ -9,9 +9,13 @@ const upload = multer({ storage: multer.memoryStorage() });
 const { verifyToken, verifyTokenAndAdmin } = require('../middleware/middleware');
 const Document = require('../models/Document.js');
 
-router.post('/', upload.single('file'), verifyTokenAndAdmin, async (req, res) => {
+router.post('/upload', upload.single('file'), verifyTokenAndAdmin, async (req, res) => {
     const file = req.file;
     const inputs = JSON.parse(req.body.inputs);
+
+    if (!file) {
+        return res.status(400).json({ message: 'Încarcă fișierul' });
+    }
 
     try {
         const document = new Document({
@@ -26,16 +30,16 @@ router.post('/', upload.single('file'), verifyTokenAndAdmin, async (req, res) =>
 
         await document.save();
 
-        const organization = await Organization.findOneAndUpdate(
+        await Organization.findOneAndUpdate(
             { admin: req.user.id },
             { $push: { documents: document._id } },
             { new: true },
         );
 
-        res.sendStatus(200);
+        res.status(200).json({ message: 'Documentul a fost încărcat cu success' });
     } catch (error) {
         console.error(error);
-        res.sendStatus(500);
+        res.status(200).json({ message: 'A apărut o eroare' });
     }
 });
 
@@ -90,6 +94,7 @@ router.get('/getfile/:id', verifyToken, async (req, res) => {
         const id = req.params.id;
         const documentData = req.query;
         const document = await Document.findById(id);
+
         if (!document) {
             return res.status(404).json({ message: 'Documentul nu a fost găsit' });
         }
@@ -105,44 +110,6 @@ router.get('/getfile/:id', verifyToken, async (req, res) => {
         });
 
         doc.render(documentData);
-        // doc.render({
-        //     project: 'Ministerul Economiei (MDED)',
-        //     offer: [
-        //         {
-        //             livrabil: 'Creare Web-Design',
-        //             price: '450',
-        //             quantity: '1',
-        //             unity_price: '450',
-        //         },
-        //         {
-        //             livrabil: 'Crearea părții Front-End (Partea vizuală)',
-        //             price: '600',
-        //             quantity: '1',
-        //             unity_price: '600',
-        //         },
-        //         {
-        //             livrabil:
-        //                 'Adaptarea vizualului pentru toate tipurile de device-uri și pentru majoritatea browser-urilor + testarea',
-        //             price: '200',
-        //             quantity: '1',
-        //             unity_price: '200',
-        //         },
-        //         {
-        //             livrabil: 'Securizarea Admin Dashboard-ului',
-        //             price: '250',
-        //             quantity: '1',
-        //             unity_price: '250',
-        //         },
-        //         {
-        //             livrabil: 'Testarea si Publicarea site-ului',
-        //             price: '250',
-        //             quantity: '1',
-        //             unity_price: '250',
-        //         },
-        //     ],
-        //     company_fee: '250',
-        //     total_price: '2000',
-        // });
 
         const buf = doc.getZip().generate({
             type: 'nodebuffer',
