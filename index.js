@@ -15,6 +15,8 @@ app.use(bodyParser.json());
 app.use(
     cors({
         origin: process.env.ORIGIN,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true,
     }),
 );
 mongoose.set('strictQuery', false);
