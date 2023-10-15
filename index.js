@@ -17,7 +17,6 @@ app.use(
         origin: process.env.ORIGIN,
     }),
 );
-
 mongoose.set('strictQuery', false);
 mongoose
     .connect(process.env.MONGODB_URI)
